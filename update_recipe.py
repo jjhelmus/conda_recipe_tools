@@ -119,6 +119,8 @@ class CondaRecipe(object):
         quoted_hash = '"' + hash_value + '"'
         pattern = '(?<=set hash_val = ).*(?= %})'
         lines = [re.sub(pattern, quoted_hash, l) for l in lines]
+        pattern = '(?<=set hash_value = ).*(?= %})'
+        lines = [re.sub(pattern, quoted_hash, l) for l in lines]
         pattern = '(?<=set hash = ).*(?= %})'
         lines = [re.sub(pattern, quoted_hash, l) for l in lines]
         if hash_type == 'sha256':
