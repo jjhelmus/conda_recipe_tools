@@ -76,7 +76,8 @@ class CondaRecipe(object):
     def _info(self):
         """ Dictionary of recipe after rendering using jinja2. """
         text = ''.join(self._lines)
-        rendered_text = jinja2.Template(text).render()
+        defaults = {'compiler': lambda x: ''}
+        rendered_text = jinja2.Template(text).render(defaults)
         return yaml.load(rendered_text)
 
     @property
