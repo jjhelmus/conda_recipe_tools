@@ -49,7 +49,7 @@ class PyPISource(object):
         return str(max(filtered))
 
     def get_hash(self, version, filename, hash_type):
-        release_info = self._info['releases'][version]
+        release_info = self._info['releases'][str(version)]
         entry = [e for e in release_info if e['filename'] == filename][0]
         hash_value = entry['digests'][hash_type]
         return hash_value
@@ -94,7 +94,7 @@ class CondaRecipe(object):
         quoted_version = '"' + version + '"'
         pattern = '(?<=set version = ).*(?= %})'
         self._lines = [re.sub(pattern, quoted_version, l) for l in self._lines]
-        if self._info['package']['version'] != version:
+        if str(self._info['package']['version']) != str(version):
             raise AttributeError("version could not be set")
 
     @property
