@@ -45,7 +45,7 @@ def replace_index_json(input_conda_pkg, index_json, output_conda_pkg):
         files = [f.relative_to(tmp_dir) for f in tmp_dir.rglob('*')]
         with tarfile.open(output_conda_pkg, 'w:bz2') as output_tfile:
             for f in sorted(files, key=order):
-                output_tfile.add(os.path.join(tmp_dir, f), f)
+                output_tfile.add(os.path.join(tmp_dir, f), f, recursive=False)
     return
 
 
