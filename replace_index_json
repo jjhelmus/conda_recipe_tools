@@ -42,7 +42,8 @@ def replace_index_json(input_conda_pkg, index_json, output_conda_pkg):
         # add files in order of a) in info directory, b) increasing size so
         # we can access small manifest or json files without decompressing
         # possible large binary or data files
-        files = [f.relative_to(tmp_dir) for f in tmp_dir.rglob('*')]
+        link_or_file = lambda x: x.is_file() or x.is_symlink()
+        files = [f.relative_to(tmp_dir) for f in tmp_dir.rglob('*') if link_or_file(f)]
         with tarfile.open(output_conda_pkg, 'w:bz2') as output_tfile:
             for f in sorted(files, key=order):
                 output_tfile.add(os.path.join(tmp_dir, f), f, recursive=False)
