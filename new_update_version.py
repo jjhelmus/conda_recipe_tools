@@ -3,12 +3,52 @@
 import argparse
 import os
 import re
+import hashlib
 
 from collections import defaultdict
 
 import jinja2
-
+import requests
 import yaml
+
+
+def find_latest_version(recipe):
+    if recipe.url.startswith('https://pypi.io'):
+        project, filename = recipe.url.split('/')[-2:]
+        return _find_latest_version_pypi(project)
+    else:
+        return None
+
+
+def _find_latest_version_pypi(project):
+    url = 'https://pypi.org/pypi/{}/json'.format(project)
+    r = requests.get(url)
+    payload = r.json()
+    return payload['info']['version']
+
+
+def find_hash(recipe):
+    if recipe.url.startswith('https://pypi.io'):
+        project, filename = recipe.url.split('/')[-2:]
+        return _find_hash_pypi(
+            project, recipe.version, filename, recipe.hash_type)
+    else:
+        hasher = getattr(hashlib, recipe.hash_type)()
+        r = requests.get(recipe.url)
+        for chunk in r.iter_content(chunk_size=1024 * 512):
+            hasher.update(chunk)
+        return hasher.hexdigest()
+
+
+def _find_hash_pypi(project, version, filename, hash_type):
+    url = 'https://pypi.org/pypi/{}/{}/json'.format(project, version)
+    r = requests.get(url)
+    payload = r.json()
+    release = payload['releases'][version]
+    for file_info in release:
+        if file_info['filename'] == filename:
+            return file_info['digests'][hash_type]
+    return None
 
 
 class NullUndefined(jinja2.Undefined):
@@ -133,16 +173,10 @@ class CondaRecipe(object):
     @hash_value.setter
     def hash_value(self, hash_value):
         hash_type = self.hash_type
-        # non-jinja sha256: abcd... and similar replacements
-        m = re.search('\s*{}:(.+)'.format(hash_type), self.text)
-        if m is None:
-            patterns = ((
-                '{}:\s*[0-9A-Fa-f]+'.format(hash_type),
-                '{}: {}'.format(hash_type, hash_value)),)
-        else:
-            patterns = ((
-                '{}:{}(?=\r\n|\n)'.format(hash_type, m.group(1)),
-                '{}: {}'.format(hash_type, hash_value)),)
+        # non-jinja sha256: abcd...  replacement
+        patterns = ((
+            '{}:\s*[0-9A-Fa-f]+'.format(hash_type),
+            '{}: {}'.format(hash_type, hash_value)),)
         # jinja {% set blah = 'hash' %} replacements
         checksum_names = [
             'hash_value', 'hash', 'hash_val', 'sha256sum', 'checksum',
@@ -190,34 +224,41 @@ def parse_arguments():
     parser.add_argument(
         '--version', '-v', action='store', default=None,
         help="version to update the recipe to, defaults is to latest.")
+    parser.add_argument(
+        '--hash', action='store', default=None,
+        help="hash value for recipe, default will determine from source url.")
+    parser.add_argument(
+        '--build_number', action='store', default='0',
+        help="build_number for recipe.")
     return parser.parse_args()
 
 
 def main():
 
-    recipe = CondaRecipe('meta.yaml')
-    recipe.set_version('1.0.0')
-    recipe.write('meta.yaml')
-
-
-    """
     args = parse_arguments()
     recipe = CondaRecipe(args.meta)
-    source = recipe.source
 
     # update the version
     if args.version is None:
-        recipe.version = source.latest_version
+        new_version = find_latest_version(recipe)
     else:
-        recipe.version = args.version
+        new_version = args.version
+    if new_version is None:
+        raise ValueError('cannot determine version')
+    recipe.version = new_version
 
     # update the hash
-    hash_value = source.get_hash(
-        recipe.version, recipe.url_filename, recipe.hash_type)
-    recipe.hash_value = hash_value
+    if args.hash is None:
+        recipe.hash_value = find_hash(recipe)
+    else:
+        recipe.hash_value = args.hash
+
+    # update the build_number
+    if args.build_number is not None:
+        recipe.build_number = args.build_number
+
     recipe.write(args.meta)
     print("Updated", args.meta, "to version", recipe.version)
-    """
 
 
 if __name__ == "__main__":
