@@ -33,6 +33,7 @@ Prepare and run a series of builds on concourse.
 * Run `sync_cf` to rebase the feedstocks against conda-forge.
 * Run `update_recipe` for each outdated feedstock.
 * Run `prepare_batch_file` to create a batch-file.txt file.
+* Run `create_clobber` to create recipe clobber files for each feedstock.
 * Submit builds to c3i using `c3i batch batch-file.txt` 
 
 Once these builds are finished and have been added to the package reposistory.
