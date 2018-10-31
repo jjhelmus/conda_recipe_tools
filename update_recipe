@@ -172,6 +172,8 @@ class CondaRecipe(object):
 
     @hash_value.setter
     def hash_value(self, hash_value):
+        if hash_value is None:
+            raise ValueError("hash_value cannot be set to None")
         hash_type = self.hash_type
         # non-jinja sha256: abcd...  replacement
         patterns = ((
