@@ -221,8 +221,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Update a conda recipe to a given version")
     parser.add_argument(
-        '--meta', '-m', action='store', default='meta.yaml',
-        help="path to the recipe's meta.yaml files.")
+        '--meta', '-m', action='store', default=None,
+        help="meta.yaml file to update, default will try common locations")
     parser.add_argument(
         '--version', '-v', action='store', default=None,
         help="version to update the recipe to, defaults is to latest.")
@@ -238,7 +238,15 @@ def parse_arguments():
 def main():
 
     args = parse_arguments()
-    recipe = CondaRecipe(args.meta)
+    if args.meta is None:
+        try:
+            recipe = CondaRecipe('meta.yaml')
+            args.meta = 'meta.yaml'
+        except FileNotFoundError:
+            recipe = CondaRecipe('recipe/meta.yaml')
+            args.meta = 'recipe/meta.yaml'
+    else:
+        recipe = CondaRecipe(args.meta)
 
     # update the version
     if args.version is None:
