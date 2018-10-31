@@ -104,7 +104,7 @@ def push_feedstock(feedstock_path):
         archive_branch = 'archive_{version}'.format(version=version)
         logging.info('push origin/master to ' + archive_branch)
         # git push origin master:archive_version
-        feedstock.push(remote_branch=archive_branch)
+        feedstock.push(remote_branch=archive_branch, local_branch='HEAD')
 
         # force push master branch
         feedstock.checkout()        # git checkout master
