@@ -245,6 +245,9 @@ def main():
         new_version = args.version
     if new_version is None:
         raise ValueError('cannot determine version')
+    if recipe.version == new_version:
+        print("Recipe already at version:", new_version)
+        return
     recipe.version = new_version
 
     # update the hash
