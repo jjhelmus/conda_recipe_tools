@@ -18,6 +18,7 @@ Package tools
 
 Misc tools
 ----------
+* `run_grimlock` : Updates recipes and executes builds from a csv file of packages and versions.
 * `gh` : Open a GitHub repository in the current web browser.
 * `pypi` : Open a PyPI package page in the current web browser.
 * `reqs` : Attempt to list packages dependencies from PyPI.
