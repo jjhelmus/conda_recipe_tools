@@ -58,6 +58,10 @@ def find_latest_version_pypi(name, extra):
 def find_latest_version_url(name, extra):
     url = extra.get('url')
     regex = extra.get('regex', name+'-(.*).tar.gz')
+    raw = False
+    if 'ver_format' in extra:
+        ver_format = extra.get('ver_format')
+        raw = True
     if url is None:
         return None
     r = requests.get(url)
@@ -66,8 +70,11 @@ def find_latest_version_url(name, extra):
     for link in soup.find_all('a', href=True):
         match = re.match(regex, link['href'])
         if match:
-            ver_str = match.group(1)
-            versions.append(parse_version(ver_str))
+            if raw:
+                versions.append(ver_format.format(*match.groups()))
+            else:
+                ver_str = match.group(1)
+                versions.append(parse_version(ver_str))
     if len(versions) == 0:
         return None
     latest_version = max(versions)
