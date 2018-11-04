@@ -90,6 +90,68 @@ def find_latest_version_url(name, extra):
     return str(latest_version)
 
 
+def _find_latest_tbb():
+    url = 'https://github.com/01org/tbb/releases'
+    regex = '(?:.*)/([\d_U]+).tar.gz'
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text)
+    versions = []
+    for link in soup.find_all('a', href=True):
+        match = re.match(regex, link.get('href'))
+        if match:
+            raw_ver_str = match.group(1)
+            if '_U' in raw_ver_str:
+                # YYYY_UX
+                match2 = re.match('(\d+)_U(\d+)', raw_ver_str)
+                ver_str = '{}.{}'.format(*match2.groups())
+            else:
+                # YYYY
+                ver_str = raw_ver_str + '.0'
+            versions.append(parse_version(ver_str))
+    if len(versions) == 0:
+        return None
+    return str(max(versions))
+
+
+def _find_latest_graphviz():
+    url = "https://graphviz.gitlab.io/_pages/Download/Download_source.html"
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text)
+    regex = 'graphviz-(.*).tar.gz'
+    versions = []
+    for link in soup.find_all('a', href=True):
+        match = re.match(regex, link.contents[0])
+        if match:
+            ver_str = match.group(1)
+            # skip long developement snapshots
+            if len(ver_str) > 10:
+                continue
+            versions.append(parse_version(ver_str))
+    if len(versions) == 0:
+        return None
+    return str(max(versions))
+
+
+def _find_latest_hdfeos2():
+    from ftplib import FTP
+    ftp = FTP('edhs1.gsfc.nasa.gov')
+    ftp.login()
+    files = ftp.nlst('edhs/hdfeos/latest_release/')
+    ftp.close()
+    for filename in files:
+        match = re.match('(?:.*)HDF-EOS(.*)v1.00.tar.Z', filename)
+        if match:
+            return match.group(1)
+    return None
+
+
+CUSTOM = {
+    'graphviz': _find_latest_graphviz,
+    'hdfeos2': _find_latest_hdfeos2,
+    'tbb': _find_latest_tbb,
+}
+
+
 def find_latest_version(name, info):
     update_type = info['update_type']
     extra = info['update_extra']
@@ -99,6 +161,11 @@ def find_latest_version(name, info):
         return find_latest_version_url(name, extra)
     elif update_type == 'github':
         return find_latest_version_github(name, extra)
+    elif update_type == 'custom':
+        if name in CUSTOM:
+            return CUSTOM[name]()
+        else:
+            return None
     else:
         return None
 
