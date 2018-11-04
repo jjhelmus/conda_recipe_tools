@@ -58,6 +58,7 @@ def find_latest_version_pypi(name, extra):
 def find_latest_version_url(name, extra):
     url = extra.get('url')
     regex = extra.get('regex', name+'-(.*).tar.gz')
+    filter_prerelease = bool(extra.get('filter_pre', False))
     raw = False
     if 'ver_format' in extra:
         ver_format = extra.get('ver_format')
@@ -77,6 +78,8 @@ def find_latest_version_url(name, extra):
                 versions.append(parse_version(ver_str))
     if len(versions) == 0:
         return None
+    if filter_prerelease:
+        versions = [v for v in versions if not v.is_prerelease]
     latest_version = max(versions)
     return str(latest_version)
 
