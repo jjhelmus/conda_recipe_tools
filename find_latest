@@ -38,8 +38,14 @@ def clean_version_str(ver):
         'releases%2F',
         'rel%2Frelease-',
         'v',
+        'r',
+        'version-',
+        'cyrus-sasl-',
+        'gd-',
         'apache-parquet-cpp-',
         'apache-arrow-',
+        'LMDB_',
+        'xar-',
     ]
     for prefix in ver_prefix_remove:
         if ver.startswith(prefix):
