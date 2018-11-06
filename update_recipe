@@ -13,7 +13,7 @@ import yaml
 
 
 def find_latest_version(recipe):
-    if recipe.url.startswith('https://pypi.io'):
+    if recipe.url.startswith('https://pypi'):
         project, filename = recipe.url.split('/')[-2:]
         return _find_latest_version_pypi(project)
     else:
