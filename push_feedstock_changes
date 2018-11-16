@@ -14,6 +14,10 @@ from conda_build.api import render
 LOG_FORMAT = '%(asctime)s - %(levelname)s : %(message)s'
 
 
+class NotFeedstockRepo(Exception):
+    pass
+
+
 class GitRepo(object):
 
     def __init__(self, path):
@@ -68,7 +72,13 @@ class FeedStock(GitRepo):
     def __init__(self, path, feedstock_name=None):
         super(FeedStock, self).__init__(path)
         if feedstock_name is None:
-            feedstock_name = os.path.basename(path)
+            out = self._git(['config', '--get', 'remote.origin.url'])
+            origin_url = out.stdout.decode('utf-8').strip()
+            feedstock_name = origin_url.split('/')[-1]
+            if feedstock_name.endswith('.git'):
+                feedstock_name = feedstock_name[:-4]
+        if not feedstock_name.endswith('feedstock'):
+            raise NotFeedstockRepo('not a feedstock: %s' % (feedstock_name))
         self._feedstock_name = feedstock_name
 
     def add_remote(self, org, remote_name=None, check=True):
@@ -83,7 +93,12 @@ def push_feedstock(feedstock_path):
 
     returns True on success, False when the push failed
     """
-    feedstock = FeedStock(feedstock_path)
+    try:
+        feedstock = FeedStock(feedstock_path)
+    except NotFeedstockRepo:
+        logging.warn("push failed because repo is not a feedstock")
+        return False
+
     complete = feedstock.push(check=False)
     if complete.returncode:     # push failed b/c it is not a fast-forward
         logging.info('standard push failed, creating archive branch')
