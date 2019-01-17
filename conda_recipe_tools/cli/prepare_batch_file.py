@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 from subprocess import PIPE
 
-if __name__ == "__main__":
 
+def main():
     # parse args
     parser = argparse.ArgumentParser(
         description='Prepare a batch file for submission via c3i batch')
@@ -38,3 +38,7 @@ if __name__ == "__main__":
             for i in feedstocks_changed:
                 f.write(i + '\n')
     sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
