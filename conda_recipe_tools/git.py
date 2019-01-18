@@ -36,6 +36,19 @@ class GitRepo(object):
     def rebase_abort(self, check=True):
         self._git(['rebase', '--abort'], check)
 
+    def push(self, remote='origin', local_branch='master',
+             remote_branch='master', force=False, check=True):
+        refspec = '{src}:{dst}'.format(src=local_branch, dst=remote_branch)
+        if force:
+            return self._git(['push', '--force', remote, refspec], check)
+        return self._git(['push', remote, refspec], check)
+
+    def branch(self, branch_name):
+        return self._git(['checkout', '-b', branch_name])
+
+    def branch_delete(self, branch_name):
+        return self._git(['branch', '-D', branch_name])
+
     def ls_files_modified(self):
         out = self._git(['ls-files', '-m'])
         return out.stdout.decode('utf-8').split()
