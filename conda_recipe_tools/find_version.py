@@ -10,10 +10,8 @@ import requests
 
 try:
     from packaging.version import parse as parse_version
-    from packaging.version import LegacyVersion
 except ImportError:
     from pip._vendor.packaging.version import parse as parse_version
-    from pip._vendor.packaging.version import LegacyVersion
 
 
 def find_latest_version(name, info):
@@ -92,7 +90,7 @@ def _find_latest_version_url(name, extra):
         versions = [v for v in versions if not v.is_prerelease]
     latest_version = max(versions)
     if raw:
-        latest_version = LegacyVersion(latest_version)
+        latest_version = parse_version(latest_version)
     return latest_version
 
 
