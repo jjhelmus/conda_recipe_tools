@@ -1,5 +1,7 @@
 Tools useful for maintaining and updating conda recipes and packages.
 
+To install run `pip install -e .` or a similar command.
+
 Recipe tools
 ------------
 
@@ -47,9 +49,6 @@ Once these builds are finished and have been added to the package reposistory.
 
 ToDo
 ----
-
-Rewrite these tools as a Python library with entry points for better re-use.
-
 The following tools would be nice to have:
 
 * `kick_builds` : restart builds
