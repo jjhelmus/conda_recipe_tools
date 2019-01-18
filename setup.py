@@ -24,6 +24,8 @@ setup(
     install_requires=[
         'beautifulsoup4',
         'feedparser',
+        'jinja2',
+        'pyyaml',
         'requests',
         ],
     entry_points={
