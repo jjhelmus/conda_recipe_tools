@@ -180,10 +180,13 @@ def _find_latest_graphviz():
 
 def _find_latest_hdfeos2():
     from ftplib import FTP
-    ftp = FTP('edhs1.gsfc.nasa.gov')
-    ftp.login()
-    files = ftp.nlst('edhs/hdfeos/latest_release/')
-    ftp.close()
+    try:
+        ftp = FTP('edhs1.gsfc.nasa.gov')
+        ftp.login()
+        files = ftp.nlst('edhs/hdfeos/latest_release/')
+        ftp.close()
+    except:
+        return None
     for filename in files:
         match = re.match('(?:.*)HDF-EOS(.*)v1.00.tar.Z', filename)
         if match:
