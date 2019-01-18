@@ -34,7 +34,7 @@ def find_latest_version(name, info):
 
     Returns
     -------
-    version : str or None
+    version : Version or None
         The latest version, None when this cannot be determined.
 
     """
@@ -60,7 +60,7 @@ def _find_latest_version_pypi(name, extra):
     url = 'https://pypi.org/pypi/{}/json'.format(pypi_name)
     r = requests.get(url)
     payload = r.json()
-    return payload['info']['version']
+    return parse_version(payload['info']['version'])
 
 
 def _find_latest_version_url(name, extra):
@@ -89,7 +89,7 @@ def _find_latest_version_url(name, extra):
     if filter_prerelease:
         versions = [v for v in versions if not v.is_prerelease]
     latest_version = max(versions)
-    return str(latest_version)
+    return latest_version
 
 
 def _find_latest_version_github(name, extra):
@@ -152,7 +152,7 @@ def _find_latest_tbb():
             versions.append(parse_version(ver_str))
     if len(versions) == 0:
         return None
-    return str(max(versions))
+    return max(versions)
 
 
 def _find_latest_graphviz():
@@ -171,7 +171,7 @@ def _find_latest_graphviz():
             versions.append(parse_version(ver_str))
     if len(versions) == 0:
         return None
-    return str(max(versions))
+    return max(versions)
 
 
 def _find_latest_hdfeos2():
@@ -183,7 +183,7 @@ def _find_latest_hdfeos2():
     for filename in files:
         match = re.match('(?:.*)HDF-EOS(.*)v1.00.tar.Z', filename)
         if match:
-            return match.group(1)
+            return parse_version(match.group(1))
     return None
 
 
