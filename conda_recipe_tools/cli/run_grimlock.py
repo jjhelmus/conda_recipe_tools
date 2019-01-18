@@ -5,66 +5,14 @@ import datetime
 import os.path
 import subprocess
 
-from collections import defaultdict
+from conda_recipe_tools.recipe import CondaRecipe
 
-import jinja2
-
-import yaml
 
 PACKAGES_TO_SKIP = [
     'boto3',
     'botocore',
 ]
 MAX_BUILDS = '8'
-
-
-# borrowed from update_recipe
-class NullUndefined(jinja2.Undefined):
-    def __unicode__(self):
-        return self._undefined_name
-
-    def __getattr__(self, name):
-        return "{}.{}".format(self, name)
-
-    def __getitem__(self, name):
-        return '{}["{}"]'.format(self, name)
-
-
-# borrowed from update_recipe
-def render_meta_yaml(text):
-    env = jinja2.Environment(undefined=NullUndefined)
-    content = env.from_string(text).render(
-        os=os,
-        environ=defaultdict(str),
-        compiler=lambda x: x + "_compiler_stub",
-        pin_subpackage=lambda *args, **kwargs: "subpackage_stub",
-        pin_compatible=lambda *args, **kwargs: "compatible_pin_stub",
-        cdt=lambda *args, **kwargs: "cdt_stub",
-    )
-    return content
-
-
-# borrowed from update_recipe, minimal version
-class CondaRecipe(object):
-
-    def __init__(self, meta_filename):
-        """ initalize """
-        # read the meta.yaml file for the recipe
-        with open(meta_filename) as f:
-            self.text = f.read()
-        self._render_and_parse()
-
-    def _render_and_parse(self):
-        self._rendered = render_meta_yaml(self.text)
-        self._parsed = yaml.load(self._rendered)
-
-    @property
-    def name(self):
-        return self._parsed['package']['name']
-
-    @property
-    def version(self):
-        return self._parsed['package']['version']
 
 
 def srun(cmd, check=False):
