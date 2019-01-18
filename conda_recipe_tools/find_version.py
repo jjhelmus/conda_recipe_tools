@@ -39,7 +39,7 @@ def find_latest_version(name, info):
 
     """
     update_type = info['update_type']
-    extra = info['update_extra']
+    extra = info.get('update_extra', {})
     if update_type == 'pypi':
         return _find_latest_version_pypi(name, extra)
     elif update_type == 'url':
