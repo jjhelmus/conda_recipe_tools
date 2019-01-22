@@ -14,7 +14,7 @@ except ImportError:
     from pip._vendor.packaging.version import parse as parse_version
 
 
-def find_latest_version(name, update_type='pypi', extra=None):
+def find_latest_version(name, update_type='pypi', extra=None, extra_str=None):
     """ Find the latest version for a given project.
 
     Parameters
@@ -30,6 +30,10 @@ def find_latest_version(name, update_type='pypi', extra=None):
     extra : None or dict
         Additional parameters passed to the update method that are used when
         determining the latest version.
+    extra_str : None or str
+        A string encoding the extra dictionary parameters with format:
+        key1=value1;key2=value2
+        If extra_str is not None, the extra parameter is ignored.
 
     Returns
     -------
@@ -37,6 +41,11 @@ def find_latest_version(name, update_type='pypi', extra=None):
         The latest version, None when this cannot be determined.
 
     """
+    if extra_str is not None:
+        if extra_str == '':
+            extra = {}
+        else:
+            extra = dict(s.split('=') for s in extra_str.split(';'))
     if extra is None:
         extra = {}
     if update_type == 'pypi':
