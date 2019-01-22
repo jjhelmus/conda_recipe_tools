@@ -14,23 +14,22 @@ except ImportError:
     from pip._vendor.packaging.version import parse as parse_version
 
 
-def find_latest_version(name, info):
+def find_latest_version(name, update_type='pypi', extra=None):
     """ Find the latest version for a given project.
 
     Parameters
     ----------
     name : str
         Name of project to lookup version for
-    info : dict
-        Dictionary of information about the project.  The 'update_key' must
-        define how the version should be determined, the following methods are
-        supported:
+    update_type : str
+        How the latest version should be determined.  Option are:
             * pypi : Determine version from PyPI.
             * url : Look up version by parsing a URL.
             * github : Find version from GitHub release.
             * custom : Use one of the custom lookup function.
-        Additional parameters to these methods can be passed via the
-        'update_extra' dictionary entry.
+    extra : None or dict
+        Additional parameters passed to the update method that are used when
+        determining the latest version.
 
     Returns
     -------
@@ -38,8 +37,8 @@ def find_latest_version(name, info):
         The latest version, None when this cannot be determined.
 
     """
-    update_type = info['update_type']
-    extra = info.get('update_extra', {})
+    if extra is None:
+        extra = {}
     if update_type == 'pypi':
         return _find_latest_version_pypi(name, extra)
     elif update_type == 'url':

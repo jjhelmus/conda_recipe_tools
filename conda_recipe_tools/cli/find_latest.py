@@ -38,7 +38,10 @@ def main():
     if not args.no_header:
         print('package_name,latest_version')
     for name in names_to_check:
-        latest_version = find_latest_version(name, pkg_info[name])
+        info = pkg_info.get(name, {})
+        update_type = info.get('update_type', 'pypi')
+        extra = info.get('update_extra', {})
+        latest_version = find_latest_version(name, update_type, extra)
         print(f'{name},{latest_version}')
 
 
