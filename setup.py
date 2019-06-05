@@ -32,6 +32,7 @@ setup(
         'console_scripts': [
             'create_clobber=conda_recipe_tools.cli.create_clobber:main',
             'extract_index_json=conda_recipe_tools.cli.extract_index_json:main',
+            'find_changed_feedstocks=conda_recipe_tools.cli.find_changed_feedstocks:main',
             'find_latest=conda_recipe_tools.cli.find_latest:main',
             'find_outdated_packages_pypi=conda_recipe_tools.cli.find_outdated_packages_pypi:main',
             'gh=conda_recipe_tools.cli.gh:main',
