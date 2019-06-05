@@ -46,12 +46,30 @@ class GitRepo(object):
     def branch(self, branch_name):
         return self._git(['checkout', '-b', branch_name])
 
+    def branch_from(self, branch_name, start_branch='master'):
+        return self._git(['checkout', '-B', branch_name, start_branch])
+
     def branch_delete(self, branch_name):
         return self._git(['branch', '-D', branch_name])
+
+    def diff(self, commit=None, path=None):
+        cmd = ['diff']
+        if commit is not None:
+            cmd.append(commit)
+            if path is not None:
+                cmd.append(path)
+        out = self._git(cmd)
+        return out.stdout.decode('utf-8')
 
     def ls_files_modified(self):
         out = self._git(['ls-files', '-m'])
         return out.stdout.decode('utf-8').split()
+
+    @property
+    def commit_hash(self):
+        """ commit hash for the current HEAD """
+        out = self._git(['rev-parse', 'HEAD'])
+        return out.stdout.decode('utf-8').strip()
 
 
 class NotFeedstockRepo(Exception):
