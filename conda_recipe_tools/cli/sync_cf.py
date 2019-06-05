@@ -5,6 +5,7 @@
 import argparse
 import logging
 import os
+import pathlib
 import sys
 
 from conda_recipe_tools.git import FeedStock, NotFeedstockRepo
@@ -46,6 +47,9 @@ def main():
         '--file', '-f', type=str,
         help='file with feedstock directories to sync')
     parser.add_argument(
+        '--outfile',
+        help='file to write synced feedstocks, default is not to write')
+    parser.add_argument(
         '--base_dir', default='.', type=str,
         help='feedstock base directory, default is current directory')
     parser.add_argument(
@@ -69,13 +73,22 @@ def main():
         feedstock_dirs = args.feedstock_dir
 
     # sync recipes
+    successfully_rebased = []
     for feedstock_dir in feedstock_dirs:
         if feedstock_dir.endswith('/'):
             feedstock_dir = feedstock_dir[:-1]
         logging.info('rebasing: ' + feedstock_dir)
         feedstock_path = os.path.join(args.base_dir, feedstock_dir)
-        if not sync_feedstock(feedstock_path):
+        if sync_feedstock(feedstock_path):
+            successfully_rebased.append(feedstock_path)
+        else:
             logging.warning('rebase failed: ' + feedstock_dir)
+
+    # write file of successfully rebased feedstocks if requested
+    if args.outfile:
+        with open(args.outfile, 'w') as f:
+            for fs in successfully_rebased:
+                f.write(str(pathlib.Path(fs)) + '\n')
     return 0
 
 
