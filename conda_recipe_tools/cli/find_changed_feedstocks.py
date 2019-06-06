@@ -1,15 +1,15 @@
 #! /usr/bin/env python
 # find feedstocks which have changed since they were last checked
-# requires Python 3.5+
+# requires Python 3.6+
 
 import argparse
-import glob
 import json
 import logging
 import os
 import sys
 
-from conda_recipe_tools.git import GitRepo
+from conda_recipe_tools.git import FeedStock, NotFeedstockRepo
+from conda_recipe_tools.util import get_feedstock_dirs
 
 LOG_FORMAT = '%(asctime)s - %(levelname)s : %(message)s'
 
@@ -23,29 +23,52 @@ def read_last_commits(checkfile):
     return last_commits
 
 
-def update_feedstock(feedstock_path):
-    """ Update a feedstock and return the commit hash of the master branch. """
-    feedstock = GitRepo(feedstock_path)
-    feedstock.fetch()       # git fetch origin
-    feedstock.reset_hard()  # git reset --hard origin/master
-    return feedstock.commit_hash
+def find_changed_feedstocks(feedstock_dirs, last_commits, remote_org):
+    """ Return a list of feedstocks which have changed. """
+    changed_feedstocks = []
+    for feedstock_dir in feedstock_dirs:
+        logging.info('checking: ' + feedstock_dir)
+        if feedstock_dir.endswith('/'):
+            feedstock_dir = feedstock_dir[:-1]
+        try:
+            feedstock = FeedStock(feedstock_dir)
+        except NotFeedstockRepo:
+            logging.warning('not a feedstock: ' + feedstock_dir)
+            continue
+        feedstock.add_remote(remote_org, check=False)
+        feedstock.fetch(remote_org)
+        commit_hash = feedstock.rev_parse(f'{remote_org}/master')
+        if last_commits.get(feedstock_dir) != commit_hash:
+            logging.info('feedstock has changed: ' + feedstock_dir)
+            changed_feedstocks.append(feedstock_dir)
+            last_commits[feedstock_dir] = commit_hash
+    return changed_feedstocks
 
 
 def main():
     parser = argparse.ArgumentParser(description=(
         'Find feedstocks which have changed since they were last checked'))
     parser.add_argument(
+        'feedstock_dir', nargs='*',
+        help='one or more feedstock directories to check')
+    parser.add_argument(
+        '--file', '-f', type=str,
+        help='file with feedstock directories to check')
+    parser.add_argument(
+        '--outfile', default='changed_feedstocks.txt', type=str,
+        help='name of file to write changed feedstocks.')
+    parser.add_argument(
+        '--checkfile', default='cf_feedstock_commits.json', type=str,
+        help='name of file to check and store the commit hashes')
+    parser.add_argument(
+        '--remote-org', default='conda-forge', type=str,
+        help='GitHub organization to check for updates.')
+    parser.add_argument(
         '--base_dir', default='.', type=str,
         help='feedstock base directory, default is current directory')
     parser.add_argument(
         '--log', default='info',
         help='log level; debug, info, warning, error, critical')
-    parser.add_argument(
-        '--outfile', default='changed_feedstocks.txt', type=str,
-        help='name of file to write changed feedstocks.')
-    parser.add_argument(
-        '--checkfile', default='last_feedstock_commits.json', type=str,
-        help='name of file to check and store the commits hashes')
     args = parser.parse_args()
 
     # set up logging
@@ -54,17 +77,11 @@ def main():
         raise ValueError('Invalid log level: %s' % args.log)
     logging.basicConfig(level=log_numeric_level, format=LOG_FORMAT)
 
-    # update and find outdated feedstocks
+    # find outdated feedstocks
+    feedstock_dirs = get_feedstock_dirs(args.feedstock_dir, args.file)
     last_commits = read_last_commits(args.checkfile)
-    feedstock_paths = sorted(glob.glob('*-feedstock'))
-    changed_feedstocks = []
-    for feedstock_path in feedstock_paths:
-        logging.info('updating: ' + feedstock_path)
-        commit_hash = update_feedstock(feedstock_path)
-        if last_commits.get(feedstock_path) != commit_hash:
-            logging.info('feedstock has changed: ' + feedstock_path)
-            changed_feedstocks.append(feedstock_path)
-            last_commits[feedstock_path] = commit_hash
+    changed_feedstocks = find_changed_feedstocks(
+        feedstock_dirs, last_commits, args.remote_org)
 
     # write checkfile and outfile
     with open(args.checkfile, 'w') as f:
