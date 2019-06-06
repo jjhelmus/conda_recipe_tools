@@ -3,7 +3,6 @@
 import argparse
 import os.path
 import sys
-from collections import defaultdict
 
 from conda_build.api import render
 
@@ -17,8 +16,6 @@ def show_git_message(feedstock_dir):
 
     pkg_version = metadata.version()
     pkg_name = metadata.name()
-    pkg_build_number = metadata.build_number()
-    pkg_noarch_python = metadata.noarch_python
 
     git_message = "git commit -m '{name} {ver}' --allow-empty ".format(name=pkg_name, ver=pkg_version)
     print(git_message)
