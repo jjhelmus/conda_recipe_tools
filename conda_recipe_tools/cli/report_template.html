@@ -1,0 +1,143 @@
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+.diff .hll { background-color: #ffffcc }
+.diff  { background: #f8f8f8; }
+.diff .c { color: #408080; font-style: italic } /* Comment */
+.diff .err { border: 1px solid #FF0000 } /* Error */
+.diff .k { color: #008000; font-weight: bold } /* Keyword */
+.diff .o { color: #666666 } /* Operator */
+.diff .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.diff .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.diff .cp { color: #BC7A00 } /* Comment.Preproc */
+.diff .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.diff .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.diff .cs { color: #408080; font-style: italic } /* Comment.Special */
+.diff .gd { color: #A00000 } /* Generic.Deleted */
+.diff .ge { font-style: italic } /* Generic.Emph */
+.diff .gr { color: #FF0000 } /* Generic.Error */
+.diff .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.diff .gi { color: #00A000 } /* Generic.Inserted */
+.diff .go { color: #888888 } /* Generic.Output */
+.diff .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.diff .gs { font-weight: bold } /* Generic.Strong */
+.diff .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.diff .gt { color: #0044DD } /* Generic.Traceback */
+.diff .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.diff .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.diff .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.diff .kp { color: #008000 } /* Keyword.Pseudo */
+.diff .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.diff .kt { color: #B00040 } /* Keyword.Type */
+.diff .m { color: #666666 } /* Literal.Number */
+.diff .s { color: #BA2121 } /* Literal.String */
+.diff .na { color: #7D9029 } /* Name.Attribute */
+.diff .nb { color: #008000 } /* Name.Builtin */
+.diff .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.diff .no { color: #880000 } /* Name.Constant */
+.diff .nd { color: #AA22FF } /* Name.Decorator */
+.diff .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.diff .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.diff .nf { color: #0000FF } /* Name.Function */
+.diff .nl { color: #A0A000 } /* Name.Label */
+.diff .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.diff .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.diff .nv { color: #19177C } /* Name.Variable */
+.diff .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.diff .w { color: #bbbbbb } /* Text.Whitespace */
+.diff .mb { color: #666666 } /* Literal.Number.Bin */
+.diff .mf { color: #666666 } /* Literal.Number.Float */
+.diff .mh { color: #666666 } /* Literal.Number.Hex */
+.diff .mi { color: #666666 } /* Literal.Number.Integer */
+.diff .mo { color: #666666 } /* Literal.Number.Oct */
+.diff .sa { color: #BA2121 } /* Literal.String.Affix */
+.diff .sb { color: #BA2121 } /* Literal.String.Backtick */
+.diff .sc { color: #BA2121 } /* Literal.String.Char */
+.diff .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.diff .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.diff .s2 { color: #BA2121 } /* Literal.String.Double */
+.diff .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.diff .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.diff .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.diff .sx { color: #008000 } /* Literal.String.Other */
+.diff .sr { color: #BB6688 } /* Literal.String.Regex */
+.diff .s1 { color: #BA2121 } /* Literal.String.Single */
+.diff .ss { color: #19177C } /* Literal.String.Symbol */
+.diff .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.diff .fm { color: #0000FF } /* Name.Function.Magic */
+.diff .vc { color: #19177C } /* Name.Variable.Class */
+.diff .vg { color: #19177C } /* Name.Variable.Global */
+.diff .vi { color: #19177C } /* Name.Variable.Instance */
+.diff .vm { color: #19177C } /* Name.Variable.Magic */
+.diff .il { color: #666666 } /* Literal.Number.Integer.Long */
+</style>
+</head>
+
+<body>
+<table style="width:100%">
+    <tr>
+        <th align="left">Include</th>
+        <th align="left">Concourse Job</th>
+        <th align="left">conda-forge feedstock</th>
+        <th align="left">conda-forge diff</th>
+        <th align="left">origin diff</th>
+    </tr>
+
+    {% for entry in report_entries %}
+    <tr>
+        <td><input type="checkbox" id="{{ entry.id_checkbox }}" onchange="addFeedstock(this, '{{ entry.feedstock_name }}')"></td>
+        <td><a href="{{ entry.concourse_url }}"><b>{{ entry.pkg_name }}</b> {{ entry.version }}</a></td>
+        <td><a href="{{ entry.cf_url }}">{{ entry.feedstock_name }}</a></td>
+        <td><a href="#" onclick="toggle_visibility('{{ entry.id_diff_cf }}');">show/hide</a></td>
+        <td><a href="#" onclick="toggle_visibility('{{ entry.id_diff_origin }}');">show/hide</a></td>
+    </tr>
+
+    <tr>
+        <td colspan="5"> 
+            <div id="{{ entry.id_diff_cf }}" style="display:block;">
+            <a href="#" onclick="toggle_visibility('{{ entry.id_diff_cf }}');">hide</a>
+            <br>git diff conda-forge/master recipe
+            {{ entry.diff_cf_html }}
+            <a href="#" onclick="toggle_visibility('{{ entry.id_diff_cf }}');">hide</a>
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="5"> 
+            <div id="{{ entry.id_diff_origin }}" style="display:block;">
+            <a href="#" onclick="toggle_visibility('{{ entry.id_diff_origin }}');">hide</a>
+            <br>git diff origin/master recipe
+            {{ entry.diff_origin_html }}
+            <a href="#" onclick="toggle_visibility('{{ entry.id_diff_origin }}');">hide</a>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+        <td colspan="5">
+        <textarea id="feedstock_list" rows="30" cols="100"></textarea>
+        </td>
+    </tr>
+
+</table>
+
+<script type="text/javascript">
+    function toggle_visibility(id) {
+        var e = document.getElementById(id);
+        if(e.style.display == 'block')
+            e.style.display = 'none';
+        else
+            e.style.display = 'block';
+    }
+    function addFeedstock(checkbox, text) {
+        if (checkbox.checked) {
+            document.getElementById("feedstock_list").value += text
+            document.getElementById("feedstock_list").value += '\n' 
+        }
+    }
+</script>
+</body>
