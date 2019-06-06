@@ -6,6 +6,8 @@ import sys
 
 from conda_build.api import render
 
+from conda_recipe_tools.util import get_feedstock_dirs
+
 
 def show_git_message(feedstock_dir):
     """ print out the git message for a feedstock. """
@@ -35,15 +37,7 @@ def main():
         help='feedstock base directory, default is current directory')
     args = parser.parse_args()
 
-    # detemine feedstock directories to list
-    if args.file is not None:
-        # skip comments (#) and blank lines
-        is_valid = lambda x: not x.startswith('#') and len(x.strip())
-        with open(args.file) as f:
-            feedstock_dirs = [l.strip() for l in f if is_valid(l)]
-    else:
-        feedstock_dirs = args.feedstock_dir
-
+    feedstock_dirs = get_feedstock_dirs(args.feedstock_dir, args.file)
     for feedstock_dir in feedstock_dirs:
         if feedstock_dir.endswith('/'):
             feedstock_dir = feedstock_dir[:-1]

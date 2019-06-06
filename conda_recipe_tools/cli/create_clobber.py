@@ -10,6 +10,8 @@ from conda_build.api import render
 
 import yaml
 
+from conda_recipe_tools.util import get_feedstock_dirs
+
 LOG_FORMAT = '%(asctime)s - %(levelname)s : %(message)s'
 
 
@@ -61,15 +63,7 @@ def main():
         raise ValueError('Invalid log level: %s' % args.log)
     logging.basicConfig(level=log_numeric_level, format=LOG_FORMAT)
 
-    # detemine feedstock directories to sync
-    if args.file is not None:
-        # skip comments (#) and blank lines
-        is_valid = lambda x: not x.startswith('#') and len(x.strip())
-        with open(args.file) as f:
-            feedstock_dirs = [l.strip() for l in f if is_valid(l)]
-    else:
-        feedstock_dirs = args.feedstock_dir
-
+    feedstock_dirs = get_feedstock_dirs(args.feedstock_dir, args.file)
     for feedstock_dir in feedstock_dirs:
         if feedstock_dir.endswith('/'):
             feedstock_dir = feedstock_dir[:-1]
