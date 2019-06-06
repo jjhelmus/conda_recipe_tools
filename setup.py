@@ -31,6 +31,7 @@ setup(
     entry_points={
         'console_scripts': [
             'create_clobber=conda_recipe_tools.cli.create_clobber:main',
+            'create_diff_report=conda_recipe_tools.cli.create_diff_report:main',
             'extract_index_json=conda_recipe_tools.cli.extract_index_json:main',
             'find_changed_feedstocks=conda_recipe_tools.cli.find_changed_feedstocks:main',
             'find_latest=conda_recipe_tools.cli.find_latest:main',

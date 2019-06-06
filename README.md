@@ -20,6 +20,7 @@ Package tools
 
 Misc tools
 ----------
+* `create_diff_report` : Create a HTML report showing diffs for a collection of feedstocks.
 * `find_changed_feedstocks` : Find feedstocks which have changed since they were last checked.
 * `run_grimlock` : Updates recipes and executes builds from a csv file of packages and versions.
 * `find_latest` : Find the latest version of a package or set of packages.
