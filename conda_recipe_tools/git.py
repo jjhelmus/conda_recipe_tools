@@ -65,6 +65,10 @@ class GitRepo(object):
         out = self._git(['ls-files', '-m'])
         return out.stdout.decode('utf-8').split()
 
+    def rev_parse(self, arg):
+        out = self._git(['rev-parse', arg])
+        return out.stdout.decode('utf-8').strip()
+
     @property
     def commit_hash(self):
         """ commit hash for the current HEAD """
