@@ -41,7 +41,10 @@ def main():
         info = pkg_info.get(name, {})
         update_type = info.get('update_type', 'pypi')
         extra = info.get('update_extra', {})
-        latest_version = find_latest_version(name, update_type, extra)
+        try:
+            latest_version = find_latest_version(name, update_type, extra)
+        except:
+            latest_version = 'version_lookup_failed'
         print(f'{name},{latest_version}')
 
 
