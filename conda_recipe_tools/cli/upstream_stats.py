@@ -88,7 +88,7 @@ def main():
         dirs = get_feedstock_dirs(args.feedstock_dir, args.file)
         feedstock_paths = [os.path.join(args.base_dir, d) for d in dirs]
     if not args.no_header:
-        print('package_name,can_rebase,rebase_exact')
+        print("pkg_name,can_rebase,exact_rebase")
     for feedstock_path in feedstock_paths:
         can_be_rebased, is_exact = can_rebase(feedstock_path, args.upstream)
         pkg_name = (
