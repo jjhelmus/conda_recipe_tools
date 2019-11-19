@@ -3,6 +3,7 @@
 import logging
 import subprocess
 from subprocess import PIPE
+import os
 
 
 class GitRepo(object):
@@ -13,7 +14,11 @@ class GitRepo(object):
     def _git(self, git_args, check=True):
         args = ['git', '-C', self._path] + git_args
         logging.debug('command: ' + ' '.join(args))
-        complete = subprocess.run(args, stdout=PIPE, stderr=PIPE)
+        # set GIT_TERMINAL_PROMPT to 0 to disable prompting for credentials
+        # https://serverfault.com/a/665959
+        env = os.environ.copy()
+        env['GIT_TERMINAL_PROMPT'] = '0'
+        complete = subprocess.run(args, stdout=PIPE, stderr=PIPE, env=env)
         logging.debug('returncode: ' + str(complete.returncode))
         logging.debug('stdout: ' + complete.stdout.decode('utf-8'))
         logging.debug('stderr: ' + complete.stderr.decode('utf-8'))
