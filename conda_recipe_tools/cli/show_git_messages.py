@@ -4,22 +4,17 @@ import argparse
 import os.path
 import sys
 
-from conda_build.api import render
-
 from conda_recipe_tools.util import get_feedstock_dirs
+from conda_recipe_tools.recipe import CondaRecipe
 
 
 def show_git_message(feedstock_dir):
     """ print out the git message for a feedstock. """
-
-    recipe_dir = os.path.join(feedstock_dir, 'recipe')
-    recipes = render(recipe_dir, finalize=False)
-    metadata, download, needs_reparse = recipes[0]
-
-    pkg_version = metadata.version()
-    pkg_name = metadata.name()
-
-    git_message = "git commit -m '{name} {ver}' --allow-empty ".format(name=pkg_name, ver=pkg_version)
+    meta_path = os.path.join(feedstock_dir, 'recipe', 'meta.yaml')
+    recipe = CondaRecipe(meta_path)
+    pkg_version = recipe.version
+    pkg_name = recipe.name
+    git_message = f"git commit -m '{pkg_name} {pkg_version}' --allow-empty"
     print(git_message)
 
 
