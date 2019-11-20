@@ -59,7 +59,7 @@ def fetch_repodata(channel, subdir):
         bz2.BZ2Decompressor()
         .decompress(resp.content)
     )
-    repodata["_etag"] = resp.headers["etag"]
+    repodata["_etag"] = resp.headers.get("etag")
     with open(cache_path, 'w') as fh:
         json.dump(repodata, fh)
     repodata.pop("_etag")
