@@ -41,7 +41,7 @@ def main():
     if not args.no_header:
         print("pkg_name,base_version,upstream_version")
     if args.all:
-        pkgs = base_newest.keys()
+        pkgs = sorted(base_newest.keys())
     else:
         pkgs = args.packages
     for pkg in pkgs:
