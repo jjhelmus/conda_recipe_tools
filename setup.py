@@ -30,6 +30,7 @@ setup(
         ],
     entry_points={
         'console_scripts': [
+            'channel_newest=conda_recipe_tools.cli.channel_newest:main',
             'create_clobber=conda_recipe_tools.cli.create_clobber:main',
             'create_diff_report=conda_recipe_tools.cli.create_diff_report:main',
             'extract_index_json=conda_recipe_tools.cli.extract_index_json:main',
