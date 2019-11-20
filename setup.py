@@ -46,6 +46,7 @@ setup(
             'show_git_messages=conda_recipe_tools.cli.show_git_messages:main',
             'sync_cf=conda_recipe_tools.cli.sync_cf:main',
             'update_recipe=conda_recipe_tools.cli.update_recipe:main',
+            'upstream_newer=conda_recipe_tools.cli.upstream_newer:main',
             'upstream_stats=conda_recipe_tools.cli.upstream_stats:main',
         ]
     },

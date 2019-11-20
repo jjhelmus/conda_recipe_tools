@@ -28,6 +28,7 @@ Misc tools
 * `pypi` : Open a PyPI package page in the current web browser.
 * `reqs` : Attempt to list packages dependencies from PyPI.
 * `find_outdated_packages_pypi.py` : Find outdated packages on a Anaconda.org channel.
+* `upstream_newer` : Find packages where an upstream channel has a newer version.
 * `upstream_stats` : Report status of upstream rebase-ability for feedstocks.
 
 
