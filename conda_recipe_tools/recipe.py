@@ -31,7 +31,7 @@ class CondaRecipe(object):
 
     def _render_and_parse(self):
         self._rendered = render_meta_yaml(self.text)
-        self._parsed = yaml.load(self._rendered)
+        self._parsed = yaml.safe_load(self._rendered)
 
     def _apply_replacements(self, patterns):
         for pattern, replacement in patterns:
