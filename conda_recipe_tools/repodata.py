@@ -60,6 +60,7 @@ def fetch_repodata(channel, subdir):
         .decompress(resp.content)
     )
     repodata["_etag"] = resp.headers.get("etag")
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
     with open(cache_path, 'w') as fh:
         json.dump(repodata, fh)
     repodata.pop("_etag")
