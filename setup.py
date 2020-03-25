@@ -42,6 +42,7 @@ setup(
             'push_feedstock_changes=conda_recipe_tools.cli.push_feedstock_changes:main',
             'pypi=conda_recipe_tools.cli.pypi:main',
             'replace_index_json=conda_recipe_tools.cli.replace_index_json:main',
+            'rebuild_what=conda_recipe_tools.cli.rebuild_what:main',
             'reqs=conda_recipe_tools.cli.reqs:main',
             'run_grimlock=conda_recipe_tools.cli.run_grimlock:main',
             'show_git_messages=conda_recipe_tools.cli.show_git_messages:main',
