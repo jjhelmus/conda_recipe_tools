@@ -26,6 +26,9 @@ class GitRepo(object):
             complete.check_returncode()
         return complete
 
+    def clone(self, url):
+        return self._git(['clone', url, self._path])
+
     def checkout(self, branch='master'):
         return self._git(['checkout', branch])
 
