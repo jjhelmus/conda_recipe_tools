@@ -50,6 +50,7 @@ setup(
             'update_recipe=conda_recipe_tools.cli.update_recipe:main',
             'upstream_newer=conda_recipe_tools.cli.upstream_newer:main',
             'upstream_stats=conda_recipe_tools.cli.upstream_stats:main',
+            'what_needs=conda_recipe_tools.cli.what_needs:main',
         ]
     },
     license="BSD 3-clause",
