@@ -35,6 +35,7 @@ Misc tools
 * `reqs` : Attempt to list packages dependencies from PyPI.
 * `find_outdated_packages_pypi.py` : Find outdated packages on a Anaconda.org channel.
 * `rebuild_what` : Print out a list of packages to rebuild for a migration.
+* `what_needs`: Print out of a list of packages which depend on a given package.
 
 
 Suggested workflow
