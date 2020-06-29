@@ -135,6 +135,7 @@ def _clean_version_str(ver):
         'apache-arrow-',
         'LMDB_',
         'xar-',
+        'zopfli-',
     ]
     for prefix in ver_prefix_remove:
         if ver.startswith(prefix):
