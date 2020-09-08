@@ -12,7 +12,7 @@ def read_pkg_info(pkg_info_filename):
             name = row['package_name']
             update_type = row['update_type']
             extra_str = row['update_extra']
-            if extra_str == '':
+            if extra_str == '' or not extra_str:
                 extra = {}
             else:
                 extra = dict(s.split('=') for s in extra_str.split(';'))
