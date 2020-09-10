@@ -20,6 +20,10 @@ def parse_arguments():
         "--no_header", action='store_true',
         help='Do not print header line, helpful when appending to a file')
     parser.add_argument(
+            "--fail-hard", action="store_true",
+            help="If the lookup fails, this will cause the tool to exit early."
+            )
+    parser.add_argument(
         'packages', nargs='*',
         help='packages to check, leave blank to check all packages')
     return parser.parse_args()
@@ -45,6 +49,8 @@ def main():
             latest_version = find_latest_version(name, update_type, extra)
         except:
             latest_version = 'version_lookup_failed'
+            if args.fail_hard:
+                exit(1)
         print(f'{name},{latest_version}')
 
 
