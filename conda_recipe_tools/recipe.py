@@ -80,7 +80,10 @@ class CondaRecipe(object):
 
     @property
     def url(self):
-        source_section = self._parsed['source']
+        try:
+            source_section = self._parsed['source']
+        except KeyError as e:
+            raise e("Recipe does not have a source section.")
         if 'url' in source_section:
             return source_section['url']
         else:
