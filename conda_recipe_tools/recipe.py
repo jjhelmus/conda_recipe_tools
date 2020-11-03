@@ -80,7 +80,10 @@ class CondaRecipe(object):
 
     @property
     def url(self):
-        source_section = self._parsed['source']
+        try:
+            source_section = self._parsed['source']
+        except KeyError as e:
+            raise e("Recipe does not have a source section.")
         if 'url' in source_section:
             return source_section['url']
         else:
@@ -178,6 +181,8 @@ class _NullUndefined(jinja2.Undefined):
 
 
 def find_hash(recipe):
+    if not recipe.url:
+        raise ValueError('Recipe has no url.')
     if recipe.url.startswith('https://pypi.io'):
         project, filename = recipe.url.split('/')[-2:]
         return _find_hash_pypi(
