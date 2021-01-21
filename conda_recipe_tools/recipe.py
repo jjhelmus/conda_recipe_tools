@@ -66,6 +66,21 @@ class CondaRecipe(object):
         self._replace_and_check(patterns, 'version', version)
 
     @property
+    def patches(self):
+        try:
+            self._parsed['patches']
+            return True
+        except KeyError:
+            return False
+
+    @property
+    def license_type(self):
+        try:
+            return self._parsed['about']['license']
+        except KeyError:
+            return "Unknown"
+
+    @property
     def hash_type(self):
         source_section = self._parsed['source']
         if 'md5' in source_section:
@@ -89,6 +104,13 @@ class CondaRecipe(object):
             return source_section['url']
         else:
             return None
+
+    @property
+    def dev_url(self):
+        try:
+            return self._parsed['about']['dev_url']
+        except KeyError:
+            return ""
 
     @property
     def hash_value(self):
