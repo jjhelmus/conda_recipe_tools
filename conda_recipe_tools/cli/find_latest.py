@@ -5,6 +5,8 @@ import os
 from conda_recipe_tools.find_version import find_latest_version
 from conda_recipe_tools.pkg_info import read_pkg_info
 
+from bs4 import FeatureNotFound
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -47,6 +49,8 @@ def main():
         extra = info.get('update_extra', {})
         try:
             latest_version = find_latest_version(name, update_type, extra)
+        except FeatureNotFound as e:
+            raise e
         except:
             latest_version = 'version_lookup_failed'
             if args.fail_hard:
