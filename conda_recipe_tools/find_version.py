@@ -80,7 +80,7 @@ def _find_latest_version_url(name, extra):
         ver_format = extra.get('ver_format')
         raw = True
     if url is None:
-        return None
+        return "Url is None"
     r = requests.get(url)
     soup = BeautifulSoup(r.text, 'lxml')
     versions = []
@@ -93,7 +93,7 @@ def _find_latest_version_url(name, extra):
                 ver_str = match.group(1)
                 versions.append(parse_version(ver_str))
     if len(versions) == 0:
-        return None
+        return "No versions found"
     if filter_prerelease:
         versions = [v for v in versions if not v.is_prerelease]
     latest_version = max(versions)
