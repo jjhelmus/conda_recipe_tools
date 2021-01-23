@@ -60,7 +60,7 @@ def find_latest_version(name, update_type='pypi', extra=None, extra_str=None):
         else:
             return None
     else:
-        return None
+        return f'skipped-{update_type}-{extra}'
 
 
 def _find_latest_version_pypi(name, extra):
