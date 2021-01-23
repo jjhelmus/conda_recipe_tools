@@ -114,8 +114,11 @@ def _max_version_from_feed(url):
     raw_versions = [e['link'].split('/')[-1] for e in data['entries']]
     clean_versions = [_clean_version_str(v) for v in raw_versions]
     versions = [parse_version(v) for v in clean_versions]
-    filtered = [v for v in versions if not
-                (v.is_prerelease or v.is_postrelease)]
+    if _allow_post_or_pre(url):
+        filtered = versions
+    else:
+        filtered = [v for v in versions if not
+                    (v.is_prerelease or v.is_postrelease)]
     if len(filtered) == 0:
         return None
     return max(filtered)
@@ -136,11 +139,19 @@ def _clean_version_str(ver):
         'LMDB_',
         'xar-',
         'zopfli-',
+        'mpir-',
     ]
     for prefix in ver_prefix_remove:
         if ver.startswith(prefix):
             ver = ver[len(prefix):]
     return ver
+
+
+def _allow_post_or_pre(url):
+    allowed_post_or_pre = [
+        'NVIDIA/nccl',
+    ]
+    return any(elem in url for elem in allowed_post_or_pre)
 
 
 def _find_latest_tbb():

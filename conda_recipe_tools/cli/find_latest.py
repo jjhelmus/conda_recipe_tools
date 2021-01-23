@@ -6,6 +6,7 @@ from conda_recipe_tools.find_version import find_latest_version
 from conda_recipe_tools.pkg_info import read_pkg_info
 
 from bs4 import FeatureNotFound
+from requests.exceptions import ConnectionError
 
 
 def parse_arguments():
@@ -51,6 +52,8 @@ def main():
             latest_version = find_latest_version(name, update_type, extra)
         except FeatureNotFound as e:
             raise e
+        except ConnectionError as e:
+            latest_version = 'could_not_reach_url'
         except:
             latest_version = 'version_lookup_failed'
             if args.fail_hard:
