@@ -14,6 +14,19 @@ except ImportError:
     from pip._vendor.packaging.version import parse as parse_version
 
 
+class NoURLError(Exception):
+    # Raised when no url is passed.
+    pass
+
+class NoVersionError(Exception):
+    # Raised when we cannot find a version.
+    pass
+
+class NoCustomLookupError(Exception):
+    # Raised when there is no custom function implemented.
+    pass
+
+
 def find_latest_version(name, update_type='pypi', extra=None, extra_str=None):
     """ Find the latest version for a given project.
 
@@ -54,11 +67,13 @@ def find_latest_version(name, update_type='pypi', extra=None, extra_str=None):
         return _find_latest_version_url(name, extra)
     elif update_type == 'github':
         return _find_latest_version_github(name, extra)
+    elif update_type == 'gitlab':
+        return _find_latest_version_gitlab(name, extra)
     elif update_type == 'custom':
         if name in CUSTOM:
             return CUSTOM[name]()
         else:
-            return None
+            raise NoCustomLookupError(f'No lookup implemented for {name}')
     else:
         return f'skipped-{update_type}-{extra}'
 
@@ -80,7 +95,7 @@ def _find_latest_version_url(name, extra):
         ver_format = extra.get('ver_format')
         raw = True
     if url is None:
-        return "Url is None"
+        raise NoURLError('url is none')
     r = requests.get(url)
     soup = BeautifulSoup(r.text, 'lxml')
     versions = []
@@ -93,7 +108,7 @@ def _find_latest_version_url(name, extra):
                 ver_str = match.group(1)
                 versions.append(parse_version(ver_str))
     if len(versions) == 0:
-        return "No versions found"
+        raise NoVersionError("No version was found.")
     if filter_prerelease:
         versions = [v for v in versions if not v.is_prerelease]
     latest_version = max(versions)
@@ -120,7 +135,7 @@ def _max_version_from_feed(url):
         filtered = [v for v in versions if not
                     (v.is_prerelease or v.is_postrelease)]
     if len(filtered) == 0:
-        return None
+        raise NoVersionError('No version was found.')
     return max(filtered)
 
 
@@ -154,6 +169,24 @@ def _allow_post_or_pre(url):
     return any(elem in url for elem in allowed_post_or_pre)
 
 
+def _find_latest_version_gitlab(name, extra):
+    org = extra.get('gl_org', name)
+    repo = extra.get('gl_repo', name)
+    url = "https://gitlab.com/api/v4/projects/{}%2F{}/releases".format(org, repo)
+    data = requests.get(url).json()
+    raw_versions = [e['tag_name'] for e in data]
+    clean_versions = [_clean_version_str(v) for v in raw_versions]
+    versions = [parse_version(v) for v in clean_versions]
+    if _allow_post_or_pre(url):
+        filtered = versions
+    else:
+        filtered = [v for v in versions if not
+                    (v.is_prerelease or v.is_postrelease)]
+    if len(filtered) == 0:
+        raise NoVersionError('No version was found.')
+    return max(filtered)
+
+
 def _find_latest_tbb():
     url = 'https://github.com/01org/tbb/releases'
     regex = '(?:.*)/([\d_U]+).tar.gz'
@@ -173,7 +206,7 @@ def _find_latest_tbb():
                 ver_str = raw_ver_str + '.0'
             versions.append(parse_version(ver_str))
     if len(versions) == 0:
-        return None
+        raise NoVersionError('No version was found.')
     return max(versions)
 
 
@@ -192,7 +225,7 @@ def _find_latest_graphviz():
                 continue
             versions.append(parse_version(ver_str))
     if len(versions) == 0:
-        return None
+        raise NoVersionError('No version was found.')
     return max(versions)
 
 
