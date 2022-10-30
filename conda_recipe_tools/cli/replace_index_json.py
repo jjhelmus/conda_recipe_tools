@@ -24,7 +24,26 @@ def replace_index_json(input_conda_pkg, index_json, output_conda_pkg):
         tmp_dir = pathlib.Path(raw_tmp_dir)
         # extract the old tarball
         with tarfile.open(input_conda_pkg, 'r') as input_tfile:
-            input_tfile.extractall(path=tmp_dir)
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(input_tfile, path=tmp_dir)
 
         # replace the tarball index.json with the file on the command line
         current_index_json = os.path.join(tmp_dir, 'info', 'index.json')
